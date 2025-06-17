@@ -1,6 +1,6 @@
-# Instant Data Scraper
+# Instant Data Scraper - Firefox Compatible Version
 
-A rewrite of the popular [chrome extension](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) to be compatible with firefox.
+A cross-browser extension for extracting data from web pages, optimized for Firefox compatibility.
 
 ## Features
 
@@ -30,6 +30,57 @@ A rewrite of the popular [chrome extension](https://chromewebstore.google.com/de
 3. Click "This Firefox"
 4. Click "Load Temporary Add-on"
 5. Select the `manifest.json` file
+
+### Firefox Installation
+
+#### From Developer Mode (For Development/Testing)
+
+1. Open Firefox and navigate to `about:debugging`
+2. Click "This Firefox" tab
+3. Click "Load Temporary Add-on"
+4. Navigate to the extension directory and select `manifest.json`
+5. The extension will be loaded temporarily (until Firefox restart)
+
+#### Creating Firefox Extension Package (.xpi)
+
+To create a proper Firefox extension package that passes validation:
+
+1. **Exclude problematic files** - The following files should NOT be included in the Firefox package:
+   - `.git/` directory (causes validation warnings)
+   - `README.md` (development file)
+   - `validation_report.html` (development file)
+   - `.gitignore` (development file)
+   - `.cursor/` directory (development files)
+   - `js/sha256.min.js` (not needed, replaced with safer hash function)
+   - `js/handsontable.full.min.js` (not needed in Firefox version)
+   - `js/handsontable.full.min-new.js` (not needed in Firefox version)
+   - `js/xlsx.full.min.js` (not supported in Firefox version)
+
+2. **Create clean package directory**:
+   ```bash
+   mkdir firefox_package
+   cp manifest.json firefox_package/
+   cp background.js firefox_package/
+   cp popup.html firefox_package/
+   cp popup.js firefox_package/
+   cp popup.css firefox_package/
+   cp onload.js firefox_package/
+   cp onload.css firefox_package/
+   cp *.png firefox_package/
+   cp -r css firefox_package/
+   cp -r fonts firefox_package/
+   mkdir firefox_package/js
+   cp js/jquery-3.1.1.min.js firefox_package/js/
+   cp js/bootstrap.min.js firefox_package/js/
+   cp js/papaparse.min.js firefox_package/js/
+   cp js/FileSaver.js firefox_package/js/
+   ```
+
+3. **Create .xpi file**:
+   ```bash
+   cd firefox_package
+   zip -r ../instant_data_scraper_firefox.xpi *
+   ```
 
 ## Usage
 
@@ -68,48 +119,73 @@ This extension includes special compatibility enhancements for Firefox:
 
 ## File Structure
 
-```
-instant_data_scraper/
-├── manifest.json          # Extension configuration
-├── popup.html            # Extension popup interface  
-├── popup.js              # Main extension logic
-├── popup.css             # Extension styling
-├── onload.js             # Content script for page analysis
-├── onload.css            # Content script styling
-├── background.js         # Background script
-├── js/                   # JavaScript dependencies
-│   ├── jquery-3.1.1.min.js
-│   └── sha256.min.js
-└── icons/                # Extension icons
-```
+### Core Files (Required)
+- `manifest.json` - Extension configuration
+- `background.js` - Background script
+- `popup.html` - Extension popup interface  
+- `popup.js` - Main popup logic
+- `popup.css` - Popup styling
+- `onload.js` - Content script for table detection
+- `onload.css` - Content script styling
+- `pokeball*.png` - Extension icons
 
-## Version History
+### JavaScript Dependencies
+- `js/jquery-3.1.1.min.js` - DOM manipulation
+- `js/bootstrap.min.js` - UI components
+- `js/papaparse.min.js` - CSV parsing
+- `js/FileSaver.js` - File download functionality
 
-### v1.3.0 (2025-01-29)
-- **Enhanced Firefox compatibility** with multiple fallback detection methods
-- **Improved content script injection** with alternative strategies
-- **Cross-browser API normalization** for better compatibility
-- **Production optimization** with cleaned up code and improved error handling
+### Optional Assets
+- `css/` - Additional styling
+- `fonts/` - Font files
+- `webrobots_logo.png` - Branding image
 
-### v1.2.1
-- Basic Firefox support
-- Cross-browser popup interface
-- CSV export functionality
+## Validation Notes
+
+This version has been optimized to pass Firefox Add-on validation:
+-  No eval() usage
+-  Safe DOM manipulation  
+-  Proper manifest format
+-  No flagged file types
+-  Security compliance
+-  No git files included
+
+## Key Firefox Compatibility Features
+
+### Security Improvements
+- Replaced `innerHTML` assignments with safe DOM manipulation
+- Removed eval()-based libraries (sha256, handsontable)
+- Implemented custom hash function for content comparison
+- Fixed Content Security Policy compliance
+
+### Manifest Changes
+- Uses `browser_specific_settings` instead of deprecated `applications`
+- Removed unsupported `incognito: "split"` setting
+- Updated minimum Firefox version to 79.0 for proper browser_action support
+- Removed problematic library dependencies
+
+### Functional Differences from Chrome Version
+- **No Handsontable**: Uses simple HTML table for preview instead
+- **No XLSX Export**: Only CSV export available (uses PapaParse)
+- **Simplified UI**: Reduced external dependencies for better compatibility
+- **Enhanced Error Handling**: Better handling of Firefox-specific APIs
 
 ## Development
 
-### Prerequisites
-- Modern web browser (Chrome 88+, Firefox 57+, Edge 88+)
-- Basic understanding of web extensions
+### Cross-Browser API Usage
+The extension uses a compatibility pattern:
+```javascript
+const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
+```
 
-### Local Development
-1. Clone the repository
-2. Load as unpacked extension in your browser
-3. Make changes to the code
-4. Reload the extension to test changes
+This ensures the extension works in both Firefox (which uses `browser` API) and Chrome (which uses `chrome` API).
 
-### Building for Production
-The extension is production-ready as-is. No build process required.
+### Testing
+1. Test in Firefox Developer Edition for latest features
+2. Test in regular Firefox for compatibility
+3. Verify all table detection and extraction features work
+4. Test multi-page scraping functionality
+5. Verify CSV export works correctly
 
 ## Privacy Policy
 
