@@ -1,0 +1,46 @@
+{
+  "manifest_version": 2,
+  "name": "Instant Data Scraper",
+  "version": "1.2.1",
+  "description": "Instant Data Scraper extracts data from web pages and exports it as Excel or CSV files.",
+  
+  "icons": {
+    "16": "pokeball16.png",
+    "32": "pokeball32.png",
+    "64": "pokeball64.png",
+    "128": "pokeball128.png"
+  },
+
+  "browser_action": {
+    "default_icon": "pokeball64.png",
+    "default_title": "Instant Data Scraper"
+  },
+
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "*://*/*"
+  ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "incognito": "split",
+
+  "content_security_policy": "script-src 'self'; object-src 'self';",
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["onload.css"],
+      "js": [
+        "js/jquery-3.1.1.min.js",
+        "js/sha256.min.js",
+        "onload.js"
+      ]
+    }
+  ]
+}
+
