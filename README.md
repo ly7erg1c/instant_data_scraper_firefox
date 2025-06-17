@@ -1,0 +1,1 @@
+[Instant Data Scraper](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) extension modified to work on Firefox.
