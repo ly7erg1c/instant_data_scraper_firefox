@@ -61,12 +61,27 @@ function updateStats() {
     const statsDiv = document.getElementById('stats');
     if (!statsDiv) return;
     
-    statsDiv.innerHTML = `
-        <div>Pages scraped: ${extensionData.pages}</div>
-        <div>Rows collected: ${extensionData.data.length}</div>
-        <div>Rows from last page: ${extensionData.lastRows}</div>
-        <div>Working time: ${parseInt(extensionData.workingTime / 1000)}s</div>
-    `;
+    // Clear existing content
+    statsDiv.textContent = '';
+    
+    // Create elements safely
+    const pagesDiv = document.createElement('div');
+    pagesDiv.textContent = `Pages scraped: ${extensionData.pages}`;
+    
+    const rowsDiv = document.createElement('div');
+    rowsDiv.textContent = `Rows collected: ${extensionData.data.length}`;
+    
+    const lastRowsDiv = document.createElement('div');
+    lastRowsDiv.textContent = `Rows from last page: ${extensionData.lastRows}`;
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.textContent = `Working time: ${parseInt(extensionData.workingTime / 1000)}s`;
+    
+    // Append elements
+    statsDiv.appendChild(pagesDiv);
+    statsDiv.appendChild(rowsDiv);
+    statsDiv.appendChild(lastRowsDiv);
+    statsDiv.appendChild(timeDiv);
 }
 
 // Enhanced Firefox compatibility check
@@ -584,36 +599,67 @@ function displayPreview() {
     const previewData = extensionData.data.slice(0, 100); // Show first 100 rows
     extensionData.previewLength = previewData.length;
     
-    let html = '<div style="overflow: auto; max-height: 400px;">';
-    html += '<table class="table table-striped table-condensed table-bordered">';
+    // Clear existing content
+    hotDiv.textContent = '';
+    
+    // Create container div
+    const containerDiv = document.createElement('div');
+    containerDiv.style.overflow = 'auto';
+    containerDiv.style.maxHeight = '400px';
+    
+    // Create table
+    const table = document.createElement('table');
+    table.className = 'table table-striped table-condensed table-bordered';
     
     // Add headers if we have data
     if (previewData.length > 0) {
-        html += '<thead><tr>';
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
         Object.keys(previewData[0]).forEach(key => {
+            const th = document.createElement('th');
             const displayKey = extensionData.config.headers[key] || key;
-            html += `<th style="position: sticky; top: 0; background: white; border-bottom: 2px solid #ddd;">${displayKey}</th>`;
+            th.textContent = displayKey;
+            th.style.position = 'sticky';
+            th.style.top = '0';
+            th.style.background = 'white';
+            th.style.borderBottom = '2px solid #ddd';
+            headerRow.appendChild(th);
         });
-        html += '</tr></thead>';
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
     }
     
     // Add data rows
-    html += '<tbody>';
+    const tbody = document.createElement('tbody');
     previewData.forEach(row => {
-        html += '<tr>';
+        const tr = document.createElement('tr');
         Object.values(row).forEach(cell => {
+            const td = document.createElement('td');
             const cellContent = String(cell || '').substring(0, 200);
-            html += `<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${cellContent}</td>`;
+            td.textContent = cellContent;
+            td.style.maxWidth = '200px';
+            td.style.overflow = 'hidden';
+            td.style.textOverflow = 'ellipsis';
+            tr.appendChild(td);
         });
-        html += '</tr>';
+        tbody.appendChild(tr);
     });
-    html += '</tbody></table></div>';
     
+    table.appendChild(tbody);
+    containerDiv.appendChild(table);
+    hotDiv.appendChild(containerDiv);
+    
+    // Add summary message if data is limited
     if (extensionData.data.length > 100) {
-        html += `<p class="text-muted"><em>Preview limited to 100 rows. Total: ${extensionData.data.length} rows</em></p>`;
+        const summaryP = document.createElement('p');
+        summaryP.className = 'text-muted';
+        const summaryEm = document.createElement('em');
+        summaryEm.textContent = `Preview limited to 100 rows. Total: ${extensionData.data.length} rows`;
+        summaryP.appendChild(summaryEm);
+        hotDiv.appendChild(summaryP);
     }
-    
-    hotDiv.innerHTML = html;
 }
 
 // Download functions
@@ -706,7 +752,7 @@ function convertToCSV(data, delimiter = ',') {
 // Control functions
 function tryAnotherTable() {
     const hotDiv = document.getElementById('hot');
-    if (hotDiv) hotDiv.innerHTML = '';
+    if (hotDiv) hotDiv.textContent = '';
     
     browserAPI.tabs.sendMessage(currentTab.id, { action: 'nextTable' }, (response) => {
         if (response && response.tableId) {
