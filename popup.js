@@ -93,6 +93,16 @@ async function initializePopup() {
                 return;
             }
             
+            // Check for Firefox-specific URL restrictions
+            if (currentTab.url.startsWith('about:') || 
+                currentTab.url.startsWith('moz-extension:') ||
+                currentTab.url.startsWith('chrome:') ||
+                currentTab.url.startsWith('chrome-extension:')) {
+                document.getElementById('waitHeader').style.display = 'none';
+                showMessage('Cannot access browser internal pages. Please navigate to a regular webpage.', 'noResponseErr', true);
+                return;
+            }
+            
             // Initialize extension data
             extensionData.hostName = getHostName(currentTab.url);
             extensionData.startingUrl = currentTab.url;
@@ -171,7 +181,16 @@ function findTables() {
     browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
         if (browserAPI.runtime.lastError) {
             console.error('Error finding tables:', browserAPI.runtime.lastError);
-            showMessage('Unable to analyze this page. Please make sure the page is fully loaded and try refreshing.', 'noResponseErr', true);
+            
+            // Check if this is due to content script not being injected
+            if (browserAPI.runtime.lastError.message && 
+                (browserAPI.runtime.lastError.message.includes('Could not establish connection') ||
+                 browserAPI.runtime.lastError.message.includes('Receiving end does not exist'))) {
+                // Try to inject content script and retry
+                injectContentScriptAndRetry();
+            } else {
+                showMessage('Unable to analyze this page. Please make sure the page is fully loaded and try refreshing.', 'noResponseErr', true);
+            }
             return;
         }
         
@@ -186,26 +205,84 @@ function findTables() {
 }
 
 function injectContentScriptAndRetry() {
+    // For Firefox, check if content script is already available before injecting
+    if (typeof browser !== 'undefined' && browser.runtime && browser.runtime.getBrowserInfo) {
+        // This is Firefox - try to send message first to see if content script is loaded
+        browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
+            if (browserAPI.runtime.lastError || !response) {
+                // Content script not available, try to inject
+                injectContentScript();
+            } else if (response.tableId) {
+                processTableData(response);
+            } else {
+                showMessage('No tables found on this page or page not supported yet.', 'noResponseErr', true);
+            }
+        });
+    } else {
+        // Chrome - inject directly
+        injectContentScript();
+    }
+}
+
+function injectContentScript() {
     // Inject content script if not already present
     browserAPI.tabs.executeScript(currentTab.id, {
         file: 'onload.js'
     }, () => {
         if (browserAPI.runtime.lastError) {
-            showMessage('Unable to analyze this page. The page may not support data extraction.', 'noResponseErr', true);
+            console.error('Content script injection failed:', browserAPI.runtime.lastError);
+            
+            // Try alternative approach for Firefox
+            if (typeof browser !== 'undefined') {
+                // In Firefox, also try injecting jQuery dependency first
+                browserAPI.tabs.executeScript(currentTab.id, {
+                    file: 'js/jquery-3.1.1.min.js'
+                }, () => {
+                    if (browserAPI.runtime.lastError) {
+                        showMessage('Unable to analyze this page. The page may not support data extraction.', 'noResponseErr', true);
+                        return;
+                    }
+                    
+                    // Wait a bit then try onload.js again
+                    setTimeout(() => {
+                        browserAPI.tabs.executeScript(currentTab.id, {
+                            file: 'onload.js'
+                        }, () => {
+                            if (browserAPI.runtime.lastError) {
+                                showMessage('Unable to analyze this page. The page may not support data extraction.', 'noResponseErr', true);
+                                return;
+                            }
+                            retryTableSearch();
+                        });
+                    }, 500);
+                });
+            } else {
+                showMessage('Unable to analyze this page. The page may not support data extraction.', 'noResponseErr', true);
+            }
             return;
         }
         
-        // Wait a moment then try again
-        setTimeout(() => {
-            browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
-                if (response && response.tableId) {
-                    processTableData(response);
-                } else {
-                    showMessage('No tables found on this page or page not supported yet.', 'noResponseErr', true);
-                }
-            });
-        }, 1000);
+        retryTableSearch();
     });
+}
+
+function retryTableSearch() {
+    // Wait a moment then try again
+    setTimeout(() => {
+        browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
+            if (browserAPI.runtime.lastError) {
+                console.error('Error after injection:', browserAPI.runtime.lastError);
+                showMessage('Unable to communicate with page. Please refresh and try again.', 'noResponseErr', true);
+                return;
+            }
+            
+            if (response && response.tableId) {
+                processTableData(response);
+            } else {
+                showMessage('No tables found on this page or page not supported yet.', 'noResponseErr', true);
+            }
+        });
+    }, 1000);
 }
 
 function processTableData(tableData) {
