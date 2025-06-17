@@ -1,6 +1,3 @@
-[Instant Data Scraper](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) extension modified to work on Firefox.
-# Instant Data Scraper for Firefox
-
 A modified version of the popular [Instant Data Scraper](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) Chrome extension, adapted to work with Firefox browsers.
 
 ## Overview
