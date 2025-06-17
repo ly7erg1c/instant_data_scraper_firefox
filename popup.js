@@ -1,3 +1,719 @@
-/*! InstantDataScraperNext - 2025-01-29 */
+/*! InstantDataScraperNext - 2025-01-29 - Firefox Compatible */
 
-function e(e,t,n,o,r,a,i){var s={},c=null,l=!1,d=!1,f={urls:["<all_urls>"],tabId:n,types:["main_frame","sub_frame","stylesheet","script","font","object","xmlhttprequest","other"]};function u(){!l&&d&&(i||function(e){e(!0)})(function(e){if(!e)return g();l||(l=!0,chrome.webRequest.onBeforeRequest.removeListener(p),chrome.webRequest.onCompleted.removeListener(h),chrome.webRequest.onErrorOccurred.removeListener(h),t())})}function p(e){s[e.requestId]=1,c=new Date}function h(e){c&&(delete s[e.requestId],Object.keys(s).length||g())}function g(){setTimeout(function(){new Date-c<r||Object.keys(s).length||u()},r)}chrome.webRequest.onBeforeRequest.addListener(p,f),chrome.webRequest.onCompleted.addListener(h,f),chrome.webRequest.onErrorOccurred.addListener(h,f),(e||function(e){e()})(function(){setTimeout(u,o),setTimeout(function(){d=!0,g()},a)})}function t(e,t){return t&&(e+=1462),(Date.parse(e)-new Date(Date.UTC(1899,11,30)))/864e5}function n(e,n){for(var o={},r={s:{c:1e7,r:1e7},e:{c:0,r:0}},a=0;a!=e.length;++a)for(var i=0;i!=e[a].length;++i){r.s.r>a&&(r.s.r=a),r.s.c>i&&(r.s.c=i),r.e.r<a&&(r.e.r=a),r.e.c<i&&(r.e.c=i);var s={v:e[a][i]};if(null!==s.v){var c=XLSX.utils.encode_cell({c:i,r:a});"number"==typeof s.v?s.t="n":"boolean"==typeof s.v?s.t="b":s.v instanceof Date?(s.t="n",s.z=XLSX.SSF._table[14],s.v=t(s.v)):s.t="s",o[c]=s}}return r.s.c<1e7&&(o["!ref"]=XLSX.utils.encode_range(r)),o}function o(e,t){e.data.unshift(e.fields);var o=new function e(){if(!(this instanceof e))return new e;this.SheetNames=[],this.Sheets={}},r=n(e.data);return o.SheetNames.push(t),o.Sheets[t]=r,XLSX.write(o,{type:"binary"})}function r(e){try{e()}catch(e){console.log("Error: ",e)}}import a from"./js/google-analytics.js";var i={id:parseInt(u("tabid")),url:u("url")},s={},c=1e3,l=null;async function d(){null!==i.url.toLowerCase().match(/\/\/[a-z]+\.linkedin\.com/)?($("#waitHeader").hide(),p("We're unable to collect data from LinkedIn. Sorry for the inconvenience.  If you have further questons please contact us at info@webrobots.io","noResponseErr",!1,!0)):(I(),setTimeout(function(){console.log("no response"),$("#waitHeader").is(":visible")&&y(!0)},5e4),$(window).resize(function(){v()}),R())}function f(e,t){return(t||".")+e.replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g,"\\$&")}function u(e){for(var t=window.location.search.substring(1).split("&"),n=0;n<t.length;n++){var o=t[n].split("=");if(decodeURIComponent(o[0])==e)return decodeURIComponent(o[1])}}function p(e,t,n,o){if(""===e)return $("#"+t).hide();$("#"+t).show().text(e),n&&L(e),o&&a.fireEvent("Error",{url:s.startingUrl||i.url,msg:e})}function h(e){var t=e.length,n={"":1/0},o={},r={},a={},i={};function c(e){return e in n?n[e]:(n[e]=$(f(e)).length,n[e])}e.forEach(function(e){for(var t in e)t in o||(o[t]=0),o[t]++}),Object.keys(o).map(function(e){return[o[e],e]}).forEach(function([n,o]){var s="",l=1/0;o.split(" ")[0].split("/").slice(1).reverse().forEach(function(e){e.split(".").slice(1).forEach(function(e){l<2*t||c(e)>=l||(s=e,l=c(e))})});var d=o.split(" ")[1],f=0,u=e.map(function(e){return o in e});d&&isNaN(d)&&(s+=" "+d),s in r?(r[s].forEach(function(e,t){if(!f){var n=!0;e.forEach(function(e,t){n&=!(u[t]&&e)}),n&&(f=t+1)}}),f?r[s][f-1]=r[s][f-1].map(function(e,t){return u[t]||e}):(r[s].push(u),f=r[s].length),f>1&&(s+=" "+f)):r[s]=[u],s in a||(a[s]=[]),a[s].push(o),s in i||(i[s]=0),i[s]+=n});var l={},d={fields:r=Object.keys(a).filter(function(n){var o={},r=[];return!(n in s.config.deletedFields)&&(e.map(function(e){for(var t,i=0;i<a[n].length;i++)a[n][i]in e&&((t=e[a[n][i]])in o||(o[t]=0),o[t]++);r.push(t)}),Object.keys(o).length&&o[Object.keys(o)[0]]==t?(0,!1):(r=JSON.stringify(r))in l?(0,!1):(l[r]=1,!(i[n]<.2*t)||(0,!1)))}),data:e.map(function(e){return r.map(function(t){for(var n=0;n<a[t].length;n++)if(a[t][n]in e)return e[a[t][n]];return""})})};return s.names=r,s.namePaths=a,d}function g(e){return e.map(function(e){return e in s.config.headers?s.config.headers[e]:e})}function w(e){var t=h(e);return t.fields=g(t.fields),t}function m(e){for(var t=new ArrayBuffer(e.length),n=new Uint8Array(t),o=0;o!=e.length;++o)n[o]=255&e.charCodeAt(o);return t}function b(){a.fireEvent("Download",{hostName:s.hostName,startingUrl:s.startingUrl,dataLength:s.data.length}),(()=>{let e=e=>{let t={};for(let n=0;n<4;n++)void 0!==e[n]?t[`selector${n}`]=e[n]:t[`selector${n}`]="";return t},t=Object.keys(s.config.headers).length;t&&j(!0).then(n=>{let[o,r]=n;const i=e=>r.find(t=>t.field_id===e);let c={tableId:s.tableId,hostName:s.hostName,startingUrl:s.startingUrl};if(t)for(name in s.config.headers){let t=i(s.config.headers[name]).selector.split(",").map(e=>e.slice(-100)),n=Object.assign(e(t),c,{originalName:name,newName:s.config.headers[name]});a.fireEvent("RenameColumn",n)}})})()}function v(){var e=h(s.data);e.data=e.data.slice(0,c),s.previewLength=e.data.length;var t=$(".wtHolder").scrollTop(),n=$(".wtHolder").scrollLeft(),o=!1;$("#hot").empty();new Handsontable($("#hot").get(0),{data:e.data,colHeaders:g(e.fields),wordWrap:!1,manualColumnResize:!0,width:$(window).width()-20,height:$(window).height()-$("#hot").get(0).getBoundingClientRect().y,afterRender:function(){o||(o=!0,$(".wtHolder").scrollTop(t),$(".wtHolder").scrollLeft(n))},modifyColWidth:function(e,t){if(e>300)return 300},afterGetColHeader:function(t,n){if(-1!=t){$(n).children().length>1?$(".hot-header",n).remove():$(n).click(function(){var e=this;setTimeout(function(){$(".header-input",e).trigger("focus")},20)});var o=$("<div>",{class:"hot-header"}),r=$("<div>",{class:"header-input",contenteditable:"true"});s.config.headers[e.fields[t]]?r.text(s.config.headers[e.fields[t]]):r.text(n.firstChild.textContent),$(n).append(o),o.append(r),o.append($("<span>",{class:"glyphicon glyphicon-remove remove-column",style:"padding-top: 2.5px"}).click(function(){s.config.deletedFields[e.fields[t]]=!0,S(),$("#resetColumns").show(),v()})),r.get(0).addEventListener("input",function(n){s.config.headers[e.fields[t]]=r.text(),S()}),n.firstChild.style.display="none"}},beforeOnCellMouseDown:function(e,t,n){t.row<0&&e.stopImmediatePropagation()}})}function S(){localStorage.setItem(s.configName,JSON.stringify(s.config))}function y(e){$("#waitHeader").hide(),p("Instant Data doesn't support data extraction from this site yet. Our administrators are notified and will try to add support in the future. Thanks for trying us out!","noResponseErr",!1,!0)}function k(){return localStorage.getItem("nextSelector:"+s.hostName)}function x(e,t){if(!e)return i.reloaded?y():(i.reloaded=!0,chrome.tabs.reload(i.id,{},function(){chrome.tabs.onUpdated.addListener(function e(t,n){"complete"===n.status&&t===i.id&&(chrome.tabs.onUpdated.removeListener(e),R())})}));s.tableId=e.tableId,s.scraping=!1,s.failedToProcess=!1,s.processingError=null,s.tableSelector=e.tableSelector,s.startingUrl=e.href,s.hostName=e.hostname,s.previewLength=0,s.configName=e.hostname+"-config",s.config=JSON.parse(localStorage.getItem(s.configName))||{headers:{},deletedFields:{},crawlDelay:1e3,maxWait:2e4},r(t?()=>a.firePageViewEvent(s.hostName,s.startingUrl):()=>a.fireEvent("AnotherTable",{hostName:s.hostName,startingUrl:s.startingUrl})),Object.keys(s.config.deletedFields).length&&$("#resetColumns").show();var n=N(i.url);$("#wrongTable").show(),s.config.infinateScrollChecked&&($("#nextButton").hide(),$("#startScraping").show(),$("#infinateScroll").prop("checked",!0)),chrome.tabs.sendMessage(i.id,{action:"getTableData"},function(e){e&&e.error?p("Something went wrong!","noResponseErr",!0):e.tableId==s.tableId&&(e.failedToProcess?(p("Failed to process rows on server. Showing raw data instead.","error",!1),s.failedToProcess=!0,s.processingError=e.processingError):($("#error").hide(),s.failedToProcess=!1),s.pages||s.config.infinateScrollChecked||$("#nextButton").show(),s.pages||(s.nextSelector=k(),s.nextSelector&&chrome.tabs.sendMessage(i.id,{action:"markNextButton",selector:s.nextSelector},function(e){e.error||$("#startScraping").show()})),$("#wait").hide(),$("#content").show(),p('Download data or locate "Next" to crawl multiple pages',"instructions"),s.data=e.data,s.pages=1,s.lastRows=e.data.length,s.tableSelector=e.tableSelector,s.goodClasses=e.goodClasses,s.workingTime=0,q(),$(".download-button").show(),v(),$("#csv").off("click").click(function(){console.log("Downloading CSV..."),r(b),P({download:!0});let e=w(s.data);e.data.forEach((t,n)=>{t.forEach((t,o)=>{Array.isArray(t)&&(e.data[n][o]=Papa.unparse([t],{quotes:!0,escapeChar:'"'}))})}),saveAs(new Blob([Papa.unparse(e,{quotes:!0,escapeChar:'"'})],{type:"application/octet-stream"}),n+".csv")}),$("#xlsx").off("click").click(function(){r(b),P({download:!0}),saveAs(new Blob([m(o(w(s.data),i.url.substring(0,100)))],{type:"application/octet-stream"}),n+".xlsx")}),$("#copy").off("click").click(function(){r(b),P({download:!0}),E(Papa.unparse(w(s.data),{delimiter:"\t"}))}))})}function N(e){var t=new URL(e).hostname.split(".");return t[0].indexOf("www")>-1?t[1]:t[0]}function E(e){var t=function(t){t.preventDefault(),t.clipboardData?t.clipboardData.setData("text/plain",e):window.clipboardData&&window.clipboardData.setData("Text",e)};window.addEventListener("copy",t),document.execCommand("copy"),window.removeEventListener("copy",t)}function R(){chrome.tabs.sendMessage(i.id,{action:"findTables",robots:l},function(e){x(e,!0)})}function C(){return $("#infinateScroll").is(":checked")}function D(e){s.data=s.data.concat(e);var t=new Set;s.data.forEach(e=>t.add(JSON.stringify(e))),s.data=Array.from(t,e=>JSON.parse(e))}function T(){s.gettingNext=!1,s.scraping=!0,$("#startScraping").hide(),$("#stopScraping").show(),p("","error"),p('Please wait for more pages or press "Stop crawling".',"instructions"),C()&&$("#infinateScrollElement").hide();var t=new Date;!function n(){const o=function(e){let t={action:"scrollDown",selector:s.tableSelector};chrome.tabs.sendMessage(i.id,t,function(t){if(t&&t.error)return p("","instructions"),p(t.error,t.errorId||"error",!0);$("#wrongTable").hide(),e()})};var r=function(e){chrome.tabs.sendMessage(i.id,{action:"clickNext",selector:s.nextSelector},function(t){if(t&&t.error)return p("","instructions"),p(t.error,t.errorId,!0);$("#wrongTable").hide(),e()})};C()&&(r=o),e(r,function(){chrome.tabs.sendMessage(i.id,{action:"getTableData",selector:s.tableSelector},function(e){if(e){if(e.error)return p("","instructions"),p(e.error,e.errorId||"error",!0);e.failedToProcess?(p("Failed to process rows. Showing raw data instead.","error",!1),s.failedToProcess=!0,s.processingError=e.processingError):($("#error").hide(),s.failedToProcess=!1),s.lastRows=e.data.length,s.pages++,s.workingTime+=new Date-t,t=new Date,D(e.data),q(),s.previewLength<c?v():p("Preview limited to 1000 rows.","previewLimit"),s.scraping&&n()}})},i.id,s.config.maxWait,100,s.config.crawlDelay,function(e){chrome.tabs.sendMessage(i.id,{},function(t){e(void 0!==t)})})}()}function I(){$("#stopScraping").click(L),$("#crawlDelay").bind("propertychange change click keyup input paste",function(){var e=$(this).val();if(isNaN(e)||e<0||parseInt(1e3*e)>=s.config.maxWait)return p("Bad min waiting value","inputError");p("","inputError"),s.config.crawlDelay=parseInt(1e3*e),S()}),$("#maxWait").bind("propertychange change click keyup input paste",function(){var e=$(this).val();if(isNaN(e)||parseInt(1e3*e)<=s.config.crawlDelay)return p("Bad max waiting value","inputError");p("","inputError"),s.config.maxWait=parseInt(1e3*e),S()}),$("#resetColumns").click(function(){s.config.deletedFields={},S(),$("#resetColumns").hide(),v()}),$("#infinateScroll").click(function(e){s.config.infinateScrollChecked?(s.config.infinateScrollChecked=!1,$("#nextButton").show(),k()?$("#startScraping").show():$("#startScraping").hide()):(s.config.infinateScrollChecked=!0,$("#nextButton").hide(),$("#startScraping").show()),S()})}function L(e=null){s.scraping=!1,console.log("Scraping stopped."),$("#startScraping").show(),$("#stopScraping").hide(),p("Crawling stopped. Please download data or continue crawling.","instructions")}function O(){$("#pleaseRate").show(),$("#rateLater").show().click(function(){P({rate:"later"}),$("#pleaseRate").hide(),r(()=>a.fireEvent("Click",{button:"Rate later"}))}),$("#rate").show().click(function(){P({rate:"now"}),$("#pleaseRate").hide(),r(()=>a.fireEvent("Click",{button:"Rate now"})),chrome.tabs.create({url:"https://chrome.google.com/webstore/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah/reviews"})})}function P(e){var t=JSON.parse(localStorage.getItem("stats"))||{pages:0,rows:0,downloads:0,tabs:0,lastRateRequest:null,lastDownloads:0,lastRows:0,rated:!1};e.download?t.downloads++:e.rate?("later"==e.rate&&(t.lastRateRequest=(new Date).getTime(),t.lastDownloads=t.downloads,t.lastRows=t.rows),"now"==e.rate&&(t.rated=!0)):(1==s.pages&&t.tabs++,t.pages++,t.rows+=s.lastRows),!t.rated&&(new Date).getTime()-t.lastRateRequest>52704e5&&t.downloads-t.lastDownloads>9&&t.rows-t.lastRows>999&&O(),localStorage.setItem("stats",JSON.stringify(t))}function q(){$("#stats").empty().append($("<div>",{text:"Pages scraped: "+s.pages})).append($("<div>",{text:"Rows collected: "+s.data.length})).append($("<div>",{text:"Rows from last page: "+s.lastRows})).append($("<div>",{text:"Working time: "+parseInt(s.workingTime/1e3)+"s"})),P({})}async function j(e=!1){var t=s.tableSelector.replace(".tablescraper-selected-table",""),n=[];s.goodClasses.map(e=>e.split(" ").map(e=>"."+e).join("")).forEach(e=>{(e=e.replace(/.tablescraper-selected-row/g,"")).length&&n.push(t+" "+e+":not(:empty)")}),n.length||n.push(t+" > *:not(:empty)");var o=n.join(","),r=[];let a=s.names;for(var i of(e&&(a=a.concat(Object.keys(s.config.deletedFields))),a)){var c=s.namePaths[i];let e={target:"text"};e.field_id=i,e.param="",s.config.headers[i]&&(e.field_id=s.config.headers[i]);let t=[];for(var l of c){let n="";try{console.log("Picking selector..."),n=await U(o,l)}catch(e){console.log(e)}console.log("Selector picked: ",n),t.push(n),(l=l.split(" ")).filter(e=>"href"==e).length&&(e.target="prop",e.param="href"),l.filter(e=>"src"==e).length&&(e.target="prop",e.param="src")}e.selector=t.join(","),r.push(e)}return[o,r]}function U(e,t){return new Promise((n,o)=>{chrome.tabs.sendMessage(i.id,{action:"chooseSelector",rowSelector:e,path:t},function(e){e?n(e.selector):o(new Error("Could not choose selector!"))})})}d(),$("#wrongTable").click(function(){$("#hot").empty(),chrome.tabs.sendMessage(i.id,{action:"nextTable"},x)}),$("#nextButton").click(function(){p('Mark "Next" button or link',"instructions"),s.gettingNext=!0,function e(){chrome.tabs.sendMessage(i.id,{action:"getNextButton"},function(t){s.scraping||(s.gettingNext&&e(),t.selector&&($("#startScraping").show(),p('"Next" button located. Press "Start crawling" to get more pages or mark another button/link if marked incorrectly.',"instructions"),s.nextSelector=t.selector,localStorage.setItem("nextSelector:"+s.hostName,t.selector)))})}()}),$("#startScraping").click(T);
+// Cross-browser compatibility
+const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
+
+// Global variables
+let currentTab = null;
+let extensionData = {
+    tableId: null,
+    scraping: false,
+    failedToProcess: false,
+    processingError: null,
+    tableSelector: null,
+    startingUrl: null,
+    hostName: null,
+    previewLength: 0,
+    configName: null,
+    config: { headers: {}, deletedFields: {}, crawlDelay: 1000, maxWait: 20000 },
+    data: [],
+    pages: 0,
+    lastRows: 0,
+    workingTime: 0,
+    gettingNext: false,
+    nextSelector: null
+};
+
+// Utility functions
+function showMessage(message, elementId, isError = false) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    if (message === '') {
+        element.style.display = 'none';
+        return;
+    }
+    
+    element.style.display = 'block';
+    element.textContent = message;
+    
+    if (isError) {
+        element.className = 'alert alert-danger';
+    }
+}
+
+function getHostName(url) {
+    try {
+        const parts = new URL(url).hostname.split('.');
+        return parts[0].indexOf('www') > -1 ? parts[1] : parts[0];
+    } catch (e) {
+        return 'unknown';
+    }
+}
+
+function saveConfig() {
+    if (extensionData.configName) {
+        localStorage.setItem(extensionData.configName, JSON.stringify(extensionData.config));
+    }
+}
+
+function updateStats() {
+    const statsDiv = document.getElementById('stats');
+    if (!statsDiv) return;
+    
+    statsDiv.innerHTML = `
+        <div>Pages scraped: ${extensionData.pages}</div>
+        <div>Rows collected: ${extensionData.data.length}</div>
+        <div>Rows from last page: ${extensionData.lastRows}</div>
+        <div>Working time: ${parseInt(extensionData.workingTime / 1000)}s</div>
+    `;
+}
+
+// Main initialization function
+async function initializePopup() {
+    try {
+        // Get the active tab using cross-browser API
+        const tabs = await new Promise((resolve, reject) => {
+            browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (browserAPI.runtime.lastError) {
+                    reject(browserAPI.runtime.lastError);
+                } else {
+                    resolve(tabs);
+                }
+            });
+        });
+        
+        if (tabs && tabs.length > 0) {
+            currentTab = tabs[0];
+            
+            // Check if URL is LinkedIn (not supported)
+            if (currentTab.url.toLowerCase().match(/\/\/[a-z]+\.linkedin\.com/)) {
+                document.getElementById('waitHeader').style.display = 'none';
+                showMessage('We\'re unable to collect data from LinkedIn. Sorry for the inconvenience.', 'noResponseErr', true);
+                return;
+            }
+            
+            // Initialize extension data
+            extensionData.hostName = getHostName(currentTab.url);
+            extensionData.startingUrl = currentTab.url;
+            extensionData.configName = extensionData.hostName + '-config';
+            
+            // Load saved configuration
+            const savedConfig = localStorage.getItem(extensionData.configName);
+            if (savedConfig) {
+                try {
+                    extensionData.config = JSON.parse(savedConfig);
+                } catch (e) {
+                    console.warn('Failed to parse saved config:', e);
+                }
+            }
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Find tables on the page
+            findTables();
+            
+        } else {
+            showMessage('Unable to access current tab. Please refresh and try again.', 'noResponseErr', true);
+        }
+    } catch (error) {
+        console.error('Error initializing popup:', error);
+        showMessage('Error initializing extension. Please try again.', 'noResponseErr', true);
+    }
+}
+
+function setupEventListeners() {
+    // Download buttons
+    const csvBtn = document.getElementById('csv');
+    const xlsxBtn = document.getElementById('xlsx');
+    const copyBtn = document.getElementById('copy');
+    
+    if (csvBtn) csvBtn.addEventListener('click', downloadCSV);
+    if (xlsxBtn) xlsxBtn.addEventListener('click', downloadXLSX);
+    if (copyBtn) copyBtn.addEventListener('click', copyData);
+    
+    // Control buttons
+    const wrongTableBtn = document.getElementById('wrongTable');
+    const nextBtn = document.getElementById('nextButton');
+    const startBtn = document.getElementById('startScraping');
+    const stopBtn = document.getElementById('stopScraping');
+    const resetBtn = document.getElementById('resetColumns');
+    
+    if (wrongTableBtn) wrongTableBtn.addEventListener('click', tryAnotherTable);
+    if (nextBtn) nextBtn.addEventListener('click', locateNextButton);
+    if (startBtn) startBtn.addEventListener('click', startScraping);
+    if (stopBtn) stopBtn.addEventListener('click', stopScraping);
+    if (resetBtn) resetBtn.addEventListener('click', resetColumns);
+    
+    // Configuration inputs
+    const crawlDelayInput = document.getElementById('crawlDelay');
+    const maxWaitInput = document.getElementById('maxWait');
+    const infiniteScrollCheckbox = document.getElementById('infinateScroll');
+    
+    if (crawlDelayInput) crawlDelayInput.addEventListener('input', updateCrawlDelay);
+    if (maxWaitInput) maxWaitInput.addEventListener('input', updateMaxWait);
+    if (infiniteScrollCheckbox) infiniteScrollCheckbox.addEventListener('change', toggleInfiniteScroll);
+    
+    // Set initial input values
+    if (crawlDelayInput) crawlDelayInput.value = extensionData.config.crawlDelay / 1000;
+    if (maxWaitInput) maxWaitInput.value = extensionData.config.maxWait / 1000;
+    
+    // Initially hide content and show wait message
+    const contentDiv = document.getElementById('content');
+    const waitDiv = document.getElementById('wait');
+    if (contentDiv) contentDiv.style.display = 'none';
+    if (waitDiv) waitDiv.style.display = 'block';
+}
+
+function findTables() {
+    // Send message to content script to find tables
+    browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
+        if (browserAPI.runtime.lastError) {
+            console.error('Error finding tables:', browserAPI.runtime.lastError);
+            showMessage('Unable to analyze this page. Please make sure the page is fully loaded and try refreshing.', 'noResponseErr', true);
+            return;
+        }
+        
+        if (response && response.tableId) {
+            // Table found, process it
+            processTableData(response);
+        } else {
+            // Try to inject content script and retry
+            injectContentScriptAndRetry();
+        }
+    });
+}
+
+function injectContentScriptAndRetry() {
+    // Inject content script if not already present
+    browserAPI.tabs.executeScript(currentTab.id, {
+        file: 'onload.js'
+    }, () => {
+        if (browserAPI.runtime.lastError) {
+            showMessage('Unable to analyze this page. The page may not support data extraction.', 'noResponseErr', true);
+            return;
+        }
+        
+        // Wait a moment then try again
+        setTimeout(() => {
+            browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
+                if (response && response.tableId) {
+                    processTableData(response);
+                } else {
+                    showMessage('No tables found on this page or page not supported yet.', 'noResponseErr', true);
+                }
+            });
+        }, 1000);
+    });
+}
+
+function processTableData(tableData) {
+    extensionData.tableId = tableData.tableId;
+    extensionData.tableSelector = tableData.tableSelector;
+    
+    // Hide wait message and show content
+    const waitDiv = document.getElementById('wait');
+    const contentDiv = document.getElementById('content');
+    if (waitDiv) waitDiv.style.display = 'none';
+    if (contentDiv) contentDiv.style.display = 'block';
+    
+    // Show instructions
+    showMessage('Download data or locate "Next" to crawl multiple pages', 'instructions');
+    
+    // Show wrong table button
+    const wrongTableBtn = document.getElementById('wrongTable');
+    if (wrongTableBtn) wrongTableBtn.style.display = 'block';
+    
+    // Request table data
+    browserAPI.tabs.sendMessage(currentTab.id, { action: 'getTableData' }, (response) => {
+        if (browserAPI.runtime.lastError) {
+            console.error('Error getting table data:', browserAPI.runtime.lastError);
+            showMessage('Error extracting table data.', 'error', true);
+            return;
+        }
+        
+        if (response && response.data) {
+            if (response.error) {
+                showMessage('Something went wrong!', 'noResponseErr', true);
+                return;
+            }
+            
+            extensionData.data = response.data;
+            extensionData.pages = 1;
+            extensionData.lastRows = response.data.length;
+            
+            if (response.failedToProcess) {
+                showMessage('Failed to process rows on server. Showing raw data instead.', 'error', false);
+                extensionData.failedToProcess = true;
+            }
+            
+            updateStats();
+            displayPreview();
+            
+            // Show download buttons
+            document.querySelectorAll('.download-button').forEach(btn => {
+                btn.style.display = 'block';
+            });
+            
+            // Show next button
+            const nextBtn = document.getElementById('nextButton');
+            if (nextBtn) nextBtn.style.display = 'block';
+        } else {
+            showMessage('No data found in the table.', 'error', true);
+        }
+    });
+}
+
+function displayPreview() {
+    // Simple table preview
+    const hotDiv = document.getElementById('hot');
+    if (!hotDiv || !extensionData.data.length) return;
+    
+    const previewData = extensionData.data.slice(0, 100); // Show first 100 rows
+    extensionData.previewLength = previewData.length;
+    
+    let html = '<div style="overflow: auto; max-height: 400px;">';
+    html += '<table class="table table-striped table-condensed table-bordered">';
+    
+    // Add headers if we have data
+    if (previewData.length > 0) {
+        html += '<thead><tr>';
+        Object.keys(previewData[0]).forEach(key => {
+            const displayKey = extensionData.config.headers[key] || key;
+            html += `<th style="position: sticky; top: 0; background: white; border-bottom: 2px solid #ddd;">${displayKey}</th>`;
+        });
+        html += '</tr></thead>';
+    }
+    
+    // Add data rows
+    html += '<tbody>';
+    previewData.forEach(row => {
+        html += '<tr>';
+        Object.values(row).forEach(cell => {
+            const cellContent = String(cell || '').substring(0, 200);
+            html += `<td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${cellContent}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    
+    if (extensionData.data.length > 100) {
+        html += `<p class="text-muted"><em>Preview limited to 100 rows. Total: ${extensionData.data.length} rows</em></p>`;
+    }
+    
+    hotDiv.innerHTML = html;
+}
+
+// Download functions
+function downloadCSV() {
+    if (!extensionData.data.length) return;
+    
+    const csvContent = convertToCSV(extensionData.data);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${extensionData.hostName || 'scraped_data'}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    console.log('CSV download initiated');
+}
+
+function downloadXLSX() {
+    // For Firefox compatibility, we'll just show a message that XLSX isn't supported
+    showMessage('XLSX download is not available in the Firefox version. Please use CSV download instead.', 'error', false);
+}
+
+function copyData() {
+    if (!extensionData.data.length) return;
+    
+    const csvContent = convertToCSV(extensionData.data, '\t'); // Use tabs for better pasting
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(csvContent).then(() => {
+            showMessage('Data copied to clipboard!', 'instructions');
+        }).catch((err) => {
+            console.error('Clipboard API failed:', err);
+            fallbackCopyMethod(csvContent);
+        });
+    } else {
+        fallbackCopyMethod(csvContent);
+    }
+}
+
+function fallbackCopyMethod(text) {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showMessage('Data copied to clipboard!', 'instructions');
+    } catch (err) {
+        showMessage('Unable to copy data to clipboard', 'error', true);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function convertToCSV(data, delimiter = ',') {
+    if (!data.length) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvRows = [];
+    
+    // Add header row with renamed headers if available
+    const headerRow = headers.map(header => {
+        const displayHeader = extensionData.config.headers[header] || header;
+        return delimiter === ',' ? `"${displayHeader.replace(/"/g, '""')}"` : displayHeader;
+    });
+    csvRows.push(headerRow.join(delimiter));
+    
+    // Add data rows
+    data.forEach(row => {
+        const values = headers.map(header => {
+            const value = row[header] || '';
+            const stringValue = String(value);
+            return delimiter === ',' ? `"${stringValue.replace(/"/g, '""')}"` : stringValue;
+        });
+        csvRows.push(values.join(delimiter));
+    });
+    
+    return csvRows.join('\n');
+}
+
+// Control functions
+function tryAnotherTable() {
+    const hotDiv = document.getElementById('hot');
+    if (hotDiv) hotDiv.innerHTML = '';
+    
+    browserAPI.tabs.sendMessage(currentTab.id, { action: 'nextTable' }, (response) => {
+        if (response && response.tableId) {
+            processTableData(response);
+        } else {
+            showMessage('No more tables found on this page.', 'error', true);
+        }
+    });
+}
+
+function locateNextButton() {
+    showMessage('Mark "Next" button or link on the page', 'instructions');
+    extensionData.gettingNext = true;
+    
+    // Start listening for next button selection
+    pollForNextButton();
+}
+
+function pollForNextButton() {
+    if (!extensionData.gettingNext) return;
+    
+    browserAPI.tabs.sendMessage(currentTab.id, { action: 'getNextButton' }, (response) => {
+        if (!extensionData.scraping) {
+            if (extensionData.gettingNext) {
+                if (response && response.selector) {
+                    extensionData.nextSelector = response.selector;
+                    localStorage.setItem(`nextSelector:${extensionData.hostName}`, response.selector);
+                    showMessage('"Next" button located. Press "Start crawling" to get more pages or mark another button/link if marked incorrectly.', 'instructions');
+                    
+                    const startBtn = document.getElementById('startScraping');
+                    if (startBtn) startBtn.style.display = 'block';
+                    
+                    extensionData.gettingNext = false;
+                } else {
+                    setTimeout(pollForNextButton, 1000);
+                }
+            }
+        }
+    });
+}
+
+function startScraping() {
+    extensionData.gettingNext = false;
+    extensionData.scraping = true;
+    
+    const startBtn = document.getElementById('startScraping');
+    const stopBtn = document.getElementById('stopScraping');
+    
+    if (startBtn) startBtn.style.display = 'none';
+    if (stopBtn) stopBtn.style.display = 'block';
+    
+    showMessage('', 'error');
+    showMessage('Please wait for more pages or press "Stop crawling".', 'instructions');
+    
+    const infiniteScrollCheckbox = document.getElementById('infinateScroll');
+    if (infiniteScrollCheckbox && infiniteScrollCheckbox.checked) {
+        const infiniteScrollElement = document.getElementById('infinateScrollElement');
+        if (infiniteScrollElement) infiniteScrollElement.style.display = 'none';
+    }
+    
+    const startTime = new Date();
+    
+    // Start the scraping process
+    scrapeNextPage(startTime);
+}
+
+function scrapeNextPage(startTime) {
+    if (!extensionData.scraping) return;
+    
+    const isInfiniteScroll = document.getElementById('infinateScroll')?.checked;
+    
+    const scrollAction = () => {
+        browserAPI.tabs.sendMessage(currentTab.id, {
+            action: 'scrollDown',
+            selector: extensionData.tableSelector
+        }, handleScrollOrClickResponse);
+    };
+    
+    const clickAction = () => {
+        browserAPI.tabs.sendMessage(currentTab.id, {
+            action: 'clickNext',
+            selector: extensionData.nextSelector
+        }, handleScrollOrClickResponse);
+    };
+    
+    const action = isInfiniteScroll ? scrollAction : clickAction;
+    
+    // Use a request waiting mechanism
+    waitForPageLoad(() => {
+        browserAPI.tabs.sendMessage(currentTab.id, {
+            action: 'getTableData',
+            selector: extensionData.tableSelector
+        }, (response) => {
+            if (response) {
+                if (response.error) {
+                    showMessage('', 'instructions');
+                    showMessage(response.error, response.errorId || 'error', true);
+                    return;
+                }
+                
+                const previousLength = extensionData.data.length;
+                
+                if (response.failedToProcess) {
+                    showMessage('Failed to process rows. Showing raw data instead.', 'error', false);
+                    extensionData.failedToProcess = true;
+                    extensionData.processingError = response.processingError;
+                } else {
+                    const errorDiv = document.getElementById('error');
+                    if (errorDiv) errorDiv.style.display = 'none';
+                    extensionData.failedToProcess = false;
+                }
+                
+                extensionData.lastRows = response.data.length;
+                extensionData.pages++;
+                extensionData.workingTime += new Date() - startTime;
+                
+                // Merge new data, removing duplicates
+                mergeNewData(response.data);
+                
+                updateStats();
+                
+                if (extensionData.previewLength < 100) {
+                    displayPreview();
+                } else {
+                    showMessage('Preview limited to 100 rows.', 'previewLimit');
+                }
+                
+                // Continue scraping if still active and got new data
+                if (extensionData.scraping && extensionData.data.length > previousLength) {
+                    setTimeout(() => scrapeNextPage(new Date()), extensionData.config.crawlDelay);
+                } else if (extensionData.data.length === previousLength) {
+                    showMessage('No new data found. Scraping complete.', 'instructions');
+                    stopScraping();
+                }
+            }
+        });
+    }, currentTab.id, extensionData.config.maxWait, 100, extensionData.config.crawlDelay);
+    
+    function handleScrollOrClickResponse(response) {
+        if (response && response.error) {
+            showMessage('', 'instructions');
+            showMessage(response.error, response.errorId || 'error', true);
+            return;
+        }
+        
+        const wrongTableBtn = document.getElementById('wrongTable');
+        if (wrongTableBtn) wrongTableBtn.style.display = 'none';
+    }
+    
+    action();
+}
+
+function mergeNewData(newData) {
+    // Simple deduplication by converting to JSON strings
+    const existingDataStrings = new Set(extensionData.data.map(row => JSON.stringify(row)));
+    
+    newData.forEach(row => {
+        const rowString = JSON.stringify(row);
+        if (!existingDataStrings.has(rowString)) {
+            extensionData.data.push(row);
+            existingDataStrings.add(rowString);
+        }
+    });
+}
+
+function waitForPageLoad(callback, tabId, maxWait, checkInterval, delay, isConnectedCheck) {
+    let requestIds = {};
+    let lastRequestTime = null;
+    let listenersStopped = false;
+    let pageLoadFinished = false;
+    
+    const filters = {
+        urls: ["<all_urls>"],
+        tabId: tabId,
+        types: ["main_frame", "sub_frame", "stylesheet", "script", "font", "object", "xmlhttprequest", "other"]
+    };
+    
+    function finishWaiting() {
+        if (!listenersStopped && pageLoadFinished) {
+            if (isConnectedCheck) {
+                isConnectedCheck((connected) => {
+                    if (!connected) return checkForCompletion();
+                    listenersStopped = true;
+                    
+                    if (browserAPI.webRequest && browserAPI.webRequest.onBeforeRequest) {
+                        browserAPI.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
+                        browserAPI.webRequest.onCompleted.removeListener(onRequestComplete);
+                        browserAPI.webRequest.onErrorOccurred.removeListener(onRequestComplete);
+                    }
+                    
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        }
+    }
+    
+    function onBeforeRequest(details) {
+        requestIds[details.requestId] = 1;
+        lastRequestTime = new Date();
+    }
+    
+    function onRequestComplete(details) {
+        if (lastRequestTime) {
+            delete requestIds[details.requestId];
+            if (Object.keys(requestIds).length === 0) {
+                checkForCompletion();
+            }
+        }
+    }
+    
+    function checkForCompletion() {
+        setTimeout(() => {
+            if (new Date() - lastRequestTime < delay || Object.keys(requestIds).length > 0) {
+                return;
+            }
+            finishWaiting();
+        }, delay);
+    }
+    
+    // Add listeners if webRequest API is available
+    if (browserAPI.webRequest && browserAPI.webRequest.onBeforeRequest) {
+        browserAPI.webRequest.onBeforeRequest.addListener(onBeforeRequest, filters);
+        browserAPI.webRequest.onCompleted.addListener(onRequestComplete, filters);
+        browserAPI.webRequest.onErrorOccurred.addListener(onRequestComplete, filters);
+    }
+    
+    // Start the action and wait
+    const startAction = isConnectedCheck || (() => callback());
+    startAction(() => {
+        setTimeout(finishWaiting, maxWait);
+        setTimeout(() => {
+            pageLoadFinished = true;
+            checkForCompletion();
+        }, delay);
+    });
+}
+
+function stopScraping() {
+    extensionData.scraping = false;
+    console.log('Scraping stopped.');
+    
+    const startBtn = document.getElementById('startScraping');
+    const stopBtn = document.getElementById('stopScraping');
+    
+    if (startBtn) startBtn.style.display = 'block';
+    if (stopBtn) stopBtn.style.display = 'none';
+    
+    showMessage('Crawling stopped. Please download data or continue crawling.', 'instructions');
+}
+
+function resetColumns() {
+    extensionData.config.deletedFields = {};
+    saveConfig();
+    
+    const resetBtn = document.getElementById('resetColumns');
+    if (resetBtn) resetBtn.style.display = 'none';
+    
+    displayPreview();
+}
+
+function updateCrawlDelay() {
+    const input = document.getElementById('crawlDelay');
+    if (!input) return;
+    
+    const value = parseFloat(input.value);
+    if (isNaN(value) || value < 0 || parseInt(value * 1000) >= extensionData.config.maxWait) {
+        showMessage('Bad min waiting value', 'inputError', true);
+        return;
+    }
+    
+    showMessage('', 'inputError');
+    extensionData.config.crawlDelay = parseInt(value * 1000);
+    saveConfig();
+}
+
+function updateMaxWait() {
+    const input = document.getElementById('maxWait');
+    if (!input) return;
+    
+    const value = parseFloat(input.value);
+    if (isNaN(value) || parseInt(value * 1000) <= extensionData.config.crawlDelay) {
+        showMessage('Bad max waiting value', 'inputError', true);
+        return;
+    }
+    
+    showMessage('', 'inputError');
+    extensionData.config.maxWait = parseInt(value * 1000);
+    saveConfig();
+}
+
+function toggleInfiniteScroll() {
+    const checkbox = document.getElementById('infinateScroll');
+    if (!checkbox) return;
+    
+    const checked = checkbox.checked;
+    extensionData.config.infinateScrollChecked = checked;
+    
+    const nextBtn = document.getElementById('nextButton');
+    const startBtn = document.getElementById('startScraping');
+    
+    if (checked) {
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (startBtn) startBtn.style.display = 'block';
+    } else {
+        if (nextBtn) nextBtn.style.display = 'block';
+        if (startBtn && !extensionData.nextSelector) {
+            startBtn.style.display = 'none';
+        }
+    }
+    
+    saveConfig();
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePopup);
+} else {
+    initializePopup();
+} 
