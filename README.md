@@ -12,18 +12,7 @@ A cross-browser extension for extracting data from web pages, optimized for Fire
 - **No registration required** - Works instantly on any website
 
 ## Installation
-
-### Chrome Web Store / Edge Add-ons
-*Coming soon - extension will be available on official stores*
-
 ### Manual Installation (Development)
-
-#### Chrome/Edge
-1. Download or clone this repository
-2. Open Chrome/Edge and navigate to `chrome://extensions/` or `edge://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the extension directory
-
 #### Firefox
 1. Download or clone this repository
 2. Open Firefox and navigate to `about:debugging`
