@@ -1,6 +1,6 @@
 # Instant Data Scraper
 
-A powerful cross-browser extension for extracting tabular data from web pages and exporting it as CSV or Excel files.
+A re-write of the popular [chrome extension](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) to be compatible with firefox.
 
 ## Features
 
