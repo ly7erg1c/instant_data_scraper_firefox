@@ -5,7 +5,6 @@ const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
 
 // Global variables
 let currentTab = null;
-let debugMode = true; // Enable detailed logging for troubleshooting
 let extensionData = {
     tableId: null,
     scraping: false,
@@ -70,57 +69,33 @@ function updateStats() {
     `;
 }
 
-// Debug logging function
-function debugLog(message, data = null) {
-    if (debugMode) {
-        console.log(`[Instant Data Scraper Debug] ${message}`, data || '');
-    }
-}
-
-// Enhanced error checking for Firefox
+// Enhanced Firefox compatibility check
 function checkFirefoxCompatibility() {
-    debugLog('Checking Firefox compatibility...');
-    
     if (typeof browser !== 'undefined') {
-        debugLog('Firefox browser API detected');
-        
-        // Check if we have necessary permissions
         return new Promise((resolve) => {
             browserAPI.permissions.contains({
                 permissions: ['activeTab'],
                 origins: [currentTab.url]
             }, (result) => {
-                debugLog('Permission check result:', result);
                 resolve(result);
             });
         });
     }
-    
-    debugLog('Chrome browser API detected');
     return Promise.resolve(true);
 }
 
-// Alternative table detection method for Firefox
+// Alternative table detection for Firefox
 function alternativeTableDetection() {
-    debugLog('Attempting alternative table detection...');
-    
     return new Promise((resolve) => {
-        // Inject a simpler table detection script directly
         const simpleDetectionCode = `
             (function() {
-                console.log('[Alternative Detection] Starting...');
-                
-                // Simple table detection
                 const tables = document.querySelectorAll('table');
-                console.log('[Alternative Detection] Found tables:', tables.length);
                 
                 if (tables.length > 0) {
                     const tableData = [];
                     tables.forEach((table, index) => {
                         const rows = table.querySelectorAll('tr');
-                        console.log('[Alternative Detection] Table', index, 'has', rows.length, 'rows');
-                        
-                        if (rows.length > 2) { // At least header + 2 data rows
+                        if (rows.length > 2) {
                             tableData.push({
                                 tableId: index,
                                 selector: 'table:nth-of-type(' + (index + 1) + ')',
@@ -128,20 +103,14 @@ function alternativeTableDetection() {
                             });
                         }
                     });
-                    
-                    console.log('[Alternative Detection] Valid tables:', tableData);
                     return tableData.length > 0 ? tableData[0] : null;
                 }
                 
-                // Look for div-based tables (common in modern websites)
                 const divTables = document.querySelectorAll('[role="table"], .table, .data-table, [class*="table"]');
-                console.log('[Alternative Detection] Found div tables:', divTables.length);
-                
                 if (divTables.length > 0) {
                     for (let i = 0; i < divTables.length; i++) {
                         const children = divTables[i].children;
                         if (children.length > 3) {
-                            console.log('[Alternative Detection] Found div table with', children.length, 'children');
                             return {
                                 tableId: 0,
                                 selector: divTables[i].tagName.toLowerCase() + ':nth-of-type(' + (i + 1) + ')',
@@ -150,8 +119,6 @@ function alternativeTableDetection() {
                         }
                     }
                 }
-                
-                console.log('[Alternative Detection] No suitable tables found');
                 return null;
             })();
         `;
@@ -160,12 +127,9 @@ function alternativeTableDetection() {
             code: simpleDetectionCode
         }, (result) => {
             if (browserAPI.runtime.lastError) {
-                debugLog('Alternative detection failed:', browserAPI.runtime.lastError);
                 resolve(null);
                 return;
             }
-            
-            debugLog('Alternative detection result:', result);
             
             if (result && result[0]) {
                 resolve(result[0]);
@@ -176,12 +140,9 @@ function alternativeTableDetection() {
     });
 }
 
-// Enhanced permission check and setup
+// Permission and setup validation
 async function checkPermissionsAndSetup() {
-    debugLog('Checking permissions and setup...');
-    
     try {
-        // For Firefox, check if we can access the tab
         if (typeof browser !== 'undefined') {
             const hasPermission = await checkFirefoxCompatibility();
             if (!hasPermission) {
@@ -190,96 +151,70 @@ async function checkPermissionsAndSetup() {
             }
         }
         
-        // Test basic tab access
         return new Promise((resolve) => {
             browserAPI.tabs.get(currentTab.id, (tab) => {
                 if (browserAPI.runtime.lastError) {
-                    debugLog('Tab access failed:', browserAPI.runtime.lastError);
                     showMessage('Unable to access current tab. Please refresh and try again.', 'noResponseErr', true);
                     resolve(false);
                 } else {
-                    debugLog('Tab access successful:', tab);
                     resolve(true);
                 }
             });
         });
         
     } catch (error) {
-        debugLog('Permission check error:', error);
         return false;
     }
 }
 
 // Enhanced content script injection with multiple fallbacks
 async function injectContentScriptAndRetry() {
-    debugLog('Starting enhanced content script injection...');
-    
-    // First, check permissions
     const hasPermissions = await checkPermissionsAndSetup();
     if (!hasPermissions) {
         return;
     }
     
-    // For Firefox, check if content script is already available before injecting
+    // Firefox-specific approach
     if (typeof browser !== 'undefined' && browser.runtime && browser.runtime.getBrowserInfo) {
-        debugLog('Firefox detected - checking existing content script...');
-        
-        // This is Firefox - try to send message first to see if content script is loaded
         browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
             if (browserAPI.runtime.lastError || !response) {
-                debugLog('Content script not available, trying injection...', browserAPI.runtime.lastError);
-                // Content script not available, try to inject
                 injectContentScript();
             } else if (response.tableId !== undefined) {
-                debugLog('Content script responded successfully:', response);
                 processTableData(response);
             } else {
-                debugLog('Content script responded but no tables found, trying alternative...');
                 tryAlternativeDetection();
             }
         });
     } else {
-        debugLog('Chrome detected - injecting directly...');
-        // Chrome - inject directly
         injectContentScript();
     }
 }
 
 async function tryAlternativeDetection() {
-    debugLog('Trying alternative table detection...');
-    
     const result = await alternativeTableDetection();
     if (result) {
-        debugLog('Alternative detection found table:', result);
-        // Simulate a response similar to the content script
         processTableData({
             tableId: result.tableId,
             tableSelector: result.selector,
             alternativeDetection: true
         });
     } else {
-        debugLog('Alternative detection also failed');
         showMessage('No tables detected on this page. This may be due to the page structure or Firefox security restrictions.', 'noResponseErr', true);
     }
 }
 
 function injectContentScript() {
-    debugLog('Injecting content script...');
-    
-    // First try injecting jQuery
+    // Try injecting jQuery first
     browserAPI.tabs.executeScript(currentTab.id, {
         file: 'js/jquery-3.1.1.min.js'
     }, () => {
         if (browserAPI.runtime.lastError) {
-            debugLog('jQuery injection failed:', browserAPI.runtime.lastError);
-            
-            // Try alternative: inject jQuery from CDN
+            // Fallback: inject jQuery from CDN
             const jqueryCode = `
                 if (typeof $ === 'undefined') {
                     const script = document.createElement('script');
                     script.src = 'https://code.jquery.com/jquery-3.1.1.min.js';
                     script.onload = function() {
-                        console.log('jQuery loaded from CDN');
                         window.$ = jQuery.noConflict();
                     };
                     document.head.appendChild(script);
@@ -289,45 +224,29 @@ function injectContentScript() {
             browserAPI.tabs.executeScript(currentTab.id, {
                 code: jqueryCode
             }, () => {
-                if (browserAPI.runtime.lastError) {
-                    debugLog('CDN jQuery injection also failed, proceeding without jQuery...');
-                }
                 injectMainScript();
             });
         } else {
-            debugLog('jQuery injection successful');
             injectMainScript();
         }
     });
 }
 
 function injectMainScript() {
-    debugLog('Injecting main content script...');
-    
-    // Inject the main content script
     browserAPI.tabs.executeScript(currentTab.id, {
         file: 'onload.js'
     }, () => {
         if (browserAPI.runtime.lastError) {
-            debugLog('Main script injection failed:', browserAPI.runtime.lastError);
-            
-            // Try alternative approach - inject a simplified version inline
             tryInlineScriptInjection();
         } else {
-            debugLog('Main script injection successful');
             retryTableSearch();
         }
     });
 }
 
 function tryInlineScriptInjection() {
-    debugLog('Trying inline script injection...');
-    
     const inlineScript = `
-        // Simplified table detection for Firefox
         (function() {
-            console.log('Inline script running...');
-            
             function findSimpleTables() {
                 const tables = [];
                 const allTables = document.querySelectorAll('table');
@@ -346,7 +265,6 @@ function tryInlineScriptInjection() {
                 return tables;
             }
             
-            // Set up message listener for inline script
             if (typeof browser !== 'undefined') {
                 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     if (message.action === 'findTables') {
@@ -380,8 +298,6 @@ function tryInlineScriptInjection() {
                     return true;
                 });
             }
-            
-            console.log('Inline script setup complete');
         })();
     `;
     
@@ -389,35 +305,24 @@ function tryInlineScriptInjection() {
         code: inlineScript
     }, () => {
         if (browserAPI.runtime.lastError) {
-            debugLog('Inline script injection also failed:', browserAPI.runtime.lastError);
             showMessage('Unable to inject content script due to Firefox security restrictions. Please try refreshing the page.', 'noResponseErr', true);
         } else {
-            debugLog('Inline script injection successful');
             setTimeout(() => retryTableSearch(), 1000);
         }
     });
 }
 
 function retryTableSearch() {
-    debugLog('Retrying table search...');
-    
-    // Wait a moment then try again
     setTimeout(() => {
         browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
             if (browserAPI.runtime.lastError) {
-                debugLog('Error after injection:', browserAPI.runtime.lastError);
-                
-                // One final attempt with alternative detection
                 tryAlternativeDetection();
                 return;
             }
             
-            debugLog('Table search response:', response);
-            
             if (response && response.tableId !== undefined) {
                 processTableData(response);
             } else {
-                debugLog('No tables found in main script, trying alternative...');
                 tryAlternativeDetection();
             }
         });
@@ -426,8 +331,6 @@ function retryTableSearch() {
 
 // Main initialization function
 async function initializePopup() {
-    debugLog('Initializing popup...');
-    
     try {
         // Get the active tab using cross-browser API
         const tabs = await new Promise((resolve, reject) => {
@@ -442,7 +345,6 @@ async function initializePopup() {
         
         if (tabs && tabs.length > 0) {
             currentTab = tabs[0];
-            debugLog('Current tab:', currentTab);
             
             // Check if URL is LinkedIn (not supported)
             if (currentTab.url.toLowerCase().match(/\/\/[a-z]+\.linkedin\.com/)) {
@@ -466,8 +368,6 @@ async function initializePopup() {
             extensionData.startingUrl = currentTab.url;
             extensionData.configName = extensionData.hostName + '-config';
             
-            debugLog('Extension data initialized:', extensionData);
-            
             // Load saved configuration
             const savedConfig = localStorage.getItem(extensionData.configName);
             if (savedConfig) {
@@ -488,14 +388,11 @@ async function initializePopup() {
             showMessage('Unable to access current tab. Please refresh and try again.', 'noResponseErr', true);
         }
     } catch (error) {
-        debugLog('Error initializing popup:', error);
         showMessage('Error initializing extension. Please try again.', 'noResponseErr', true);
     }
 }
 
 function setupEventListeners() {
-    debugLog('Setting up event listeners...');
-    
     // Download buttons
     const csvBtn = document.getElementById('csv');
     const xlsxBtn = document.getElementById('xlsx');
@@ -539,18 +436,11 @@ function setupEventListeners() {
 }
 
 function findTables() {
-    debugLog('Starting table search...');
-    
-    // Send message to content script to find tables
     browserAPI.tabs.sendMessage(currentTab.id, { action: 'findTables' }, (response) => {
         if (browserAPI.runtime.lastError) {
-            debugLog('Error finding tables:', browserAPI.runtime.lastError);
-            
-            // Check if this is due to content script not being injected
             if (browserAPI.runtime.lastError.message && 
                 (browserAPI.runtime.lastError.message.includes('Could not establish connection') ||
                  browserAPI.runtime.lastError.message.includes('Receiving end does not exist'))) {
-                // Try to inject content script and retry
                 injectContentScriptAndRetry();
             } else {
                 showMessage('Unable to analyze this page. Please make sure the page is fully loaded and try refreshing.', 'noResponseErr', true);
@@ -558,21 +448,15 @@ function findTables() {
             return;
         }
         
-        debugLog('Initial table search response:', response);
-        
         if (response && response.tableId !== undefined) {
-            // Table found, process it
             processTableData(response);
         } else {
-            // Try to inject content script and retry
             injectContentScriptAndRetry();
         }
     });
 }
 
 function processTableData(tableData) {
-    debugLog('Processing table data:', tableData);
-    
     extensionData.tableId = tableData.tableId;
     extensionData.tableSelector = tableData.tableSelector;
     
@@ -591,22 +475,15 @@ function processTableData(tableData) {
     
     // If this was from alternative detection, extract data directly
     if (tableData.alternativeDetection || tableData.inlineDetection) {
-        debugLog('Using alternative/inline detection data extraction...');
         extractAlternativeTableData(tableData);
         return;
     }
     
-    // Request table data from content script
     browserAPI.tabs.sendMessage(currentTab.id, { action: 'getTableData' }, (response) => {
         if (browserAPI.runtime.lastError) {
-            debugLog('Error getting table data:', browserAPI.runtime.lastError);
-            
-            // Fallback to alternative extraction
             extractAlternativeTableData(tableData);
             return;
         }
-        
-        debugLog('Table data response:', response);
         
         if (response && response.data) {
             if (response.error) {
@@ -635,7 +512,6 @@ function processTableData(tableData) {
             const nextBtn = document.getElementById('nextButton');
             if (nextBtn) nextBtn.style.display = 'block';
         } else {
-            debugLog('No data in response, trying alternative extraction...');
             extractAlternativeTableData(tableData);
         }
     });
@@ -643,24 +519,17 @@ function processTableData(tableData) {
 
 // Alternative data extraction for when content script fails
 function extractAlternativeTableData(tableData) {
-    debugLog('Extracting table data using alternative method...');
-    
     const extractionCode = `
         (function() {
-            console.log('[Alternative Extraction] Starting for selector:', '${tableData.selector}');
-            
             const tables = document.querySelectorAll('table');
-            console.log('[Alternative Extraction] Found', tables.length, 'tables');
             
             if (tables.length === 0) {
                 return [];
             }
             
-            const table = tables[0]; // Use first table for now
+            const table = tables[0];
             const rows = table.querySelectorAll('tr');
             const data = [];
-            
-            console.log('[Alternative Extraction] Processing', rows.length, 'rows');
             
             rows.forEach((row, rowIndex) => {
                 const cells = row.querySelectorAll('td, th');
@@ -674,7 +543,6 @@ function extractAlternativeTableData(tableData) {
                 }
             });
             
-            console.log('[Alternative Extraction] Extracted', data.length, 'rows');
             return data;
         })();
     `;
@@ -683,12 +551,9 @@ function extractAlternativeTableData(tableData) {
         code: extractionCode
     }, (result) => {
         if (browserAPI.runtime.lastError) {
-            debugLog('Alternative extraction failed:', browserAPI.runtime.lastError);
             showMessage('Unable to extract table data. Firefox security restrictions may prevent data extraction.', 'error', true);
             return;
         }
-        
-        debugLog('Alternative extraction result:', result);
         
         if (result && result[0] && result[0].length > 0) {
             extensionData.data = result[0];
@@ -1156,41 +1021,6 @@ function toggleInfiniteScroll() {
     
     saveConfig();
 }
-
-// Manual debugging function for troubleshooting
-window.debugExtension = function() {
-    debugLog('=== Manual Debug Information ===');
-    debugLog('Current tab:', currentTab);
-    debugLog('Extension data:', extensionData);
-    debugLog('Browser API:', typeof browserAPI);
-    debugLog('Browser namespace:', typeof browser !== 'undefined' ? 'browser' : 'chrome');
-    
-    // Test basic table detection
-    if (currentTab) {
-        browserAPI.tabs.executeScript(currentTab.id, {
-            code: `
-                console.log('=== Page Debug Info ===');
-                console.log('Tables found:', document.querySelectorAll('table').length);
-                console.log('jQuery available:', typeof $ !== 'undefined');
-                console.log('Page URL:', window.location.href);
-                console.log('Page title:', document.title);
-                
-                const tables = document.querySelectorAll('table');
-                tables.forEach((table, i) => {
-                    console.log('Table', i, '- rows:', table.querySelectorAll('tr').length);
-                });
-                
-                return {
-                    tables: tables.length,
-                    jquery: typeof $ !== 'undefined',
-                    url: window.location.href
-                };
-            `
-        }, (result) => {
-            debugLog('Page debug result:', result);
-        });
-    }
-};
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {

@@ -1,16 +1,14 @@
-/*! InstantDataScraperNext - 2025-01-29 */
+/*! InstantDataScraperNext - 2025-01-29 - Firefox Compatible */
 
 // Cross-browser compatibility
 const browserAPI = (typeof browser !== 'undefined') ? browser : chrome;
 
-// Firefox-specific fixes
+// Firefox-specific fixes for content script environment
 if (typeof browser !== 'undefined') {
-    // Ensure jQuery is available in Firefox context
     if (typeof $ === 'undefined' && typeof jQuery !== 'undefined') {
         window.$ = jQuery;
     }
     
-    // Fix for Firefox's stricter content script environment
     if (typeof window.$ === 'undefined' && typeof unsafeWindow !== 'undefined' && unsafeWindow.$) {
         window.$ = unsafeWindow.$;
     }
