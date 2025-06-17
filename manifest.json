@@ -30,8 +30,6 @@
     "persistent": false
   },
 
-  "incognito": "split",
-
   "content_security_policy": "script-src 'self'; object-src 'self';",
 
   "content_scripts": [
@@ -40,16 +38,15 @@
       "css": ["onload.css"],
       "js": [
         "js/jquery-3.1.1.min.js",
-        "js/sha256.min.js",
         "onload.js"
       ]
     }
   ],
 
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "instant-data-scraper@webrobots.io",
-      "strict_min_version": "57.0"
+      "strict_min_version": "79.0"
     }
   }
 }
