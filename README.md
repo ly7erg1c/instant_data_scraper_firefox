@@ -1,6 +1,6 @@
 # Instant Data Scraper
 
-A re-write of the popular [chrome extension](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) to be compatible with firefox.
+A rewrite of the popular [chrome extension](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah) to be compatible with firefox.
 
 ## Features
 
